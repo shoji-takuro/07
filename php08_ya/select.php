@@ -1,38 +1,31 @@
 <?php
-
-//2. DB接続
+//1.  DB接続します
 try {
-  $pdo = new PDO('mysql:dbname=gs_db24;charset=utf8;host=localhost','root','');
+  $pdo = new PDO('mysql:dbname=gs_db99;charset=utf8;host=localhost','root','');
 } catch (PDOException $e) {
-  exit('DbConnectError:'.$e->getMessage());
+  exit('データベースに接続できませんでした。'.$e->getMessage());
 }
 
-//３．SQLを作って実行
-$stmt = $pdo->prepare("SELECT * FORM gs_an_table");
+//２．データ登録SQL作成
+$stmt = $pdo->prepare("SELECT * FROM gs_an_table");
 $status = $stmt->execute();
 
-//４．
-$view = "";
+//３．データ表示
+$view="";
 if($status==false){
+  //execute（SQL実行時にエラーがある場合）
   $error = $stmt->errorInfo();
-  exit("QueryError:".$error[2]);
-  
+  exit("ErrorQuery:".$error[2]);
 }else{
-  //Selectデータの数だけ⾃動でループしてくれる􀀁
-while( $result = $stmt->fetch(PDO::FETCH_ASSOC)){􀀁
-$view .= '<p>';􀀁
-$view .= $result["indate"] ."：". $result["name"] ;􀀁
-$view .= '</p>';
-
+  //Selectデータの数だけ自動でループしてくれる
+  while( $result = $stmt->fetch(PDO::FETCH_ASSOC)){
+      $view .= '<p>';
+      $view .= '<a href="detail.php?id='.$result["id"].'">';
+      $view .= $result["name"]."[".$result["indate"]."]<br>";
+      $view .= '</a>';
+      $view .= '</p>';
+  }
 }
-
-
-
-
-
-
-
-
 ?>
 
 
@@ -54,7 +47,6 @@ $view .= '</p>';
     <div class="container-fluid">
       <div class="navbar-header">
       <a class="navbar-brand" href="index.php">データ登録</a>
-      </div>
     </div>
   </nav>
 </header>
@@ -62,7 +54,8 @@ $view .= '</p>';
 
 <!-- Main[Start] -->
 <div>
-    <div class="container jumbotron">ここにPHP変数を埋め込む</div>
+    <div class="container jumbotron"><?=$view?></div>
+  </div>
 </div>
 <!-- Main[End] -->
 
